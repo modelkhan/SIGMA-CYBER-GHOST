@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>THE SIGMA CYBER GHOST | Black Hat Edition</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Share+Tech+Mono&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #000;
+      color: #0f0;
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      cursor: default;
+      padding: 20px;
+    }
+
+    /* CRT Scan Lines */
+    body::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        rgba(0, 20, 0, 0.12) 1px,
+        transparent 2px
+      );
+      pointer-events: none;
+      z-index: 10;
+      animation: scanMove 10s linear infinite;
+    }
+
+    @keyframes scanMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 4px; }
+    }
+
+    .grid-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(rgba(0, 30, 0, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 30, 0, 0.07) 1px, transparent 1px);
+      background-size: 28px 28px;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    canvas#matrix {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .profile-container {
+      position: relative;
+      z-index: 20;
+      margin-bottom: 20px;
+    }
+
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #0a0;
+      box-shadow:
+        0 0 10px #0f0,
+        0 0 20px #0f0,
+        0 0 30px #0f0;
+      animation: pulseGlow 2s infinite alternate;
+      background-color: #000;
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 10px #0f0, 0 0 20px #0f0; }
+      100% { box-shadow: 0 0 16px #0f0, 0 0 32px #0f0, 0 0 48px #0f0; }
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      margin-bottom: 24px;
+      letter-spacing: 1.5px;
+      color: #0f0;
+      text-shadow: 0 0 10px #0f0;
+      position: relative;
+      z-index: 20;
+      animation: glitchFlicker 1.5s infinite;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    @keyframes glitchFlicker {
+      0%, 100% { opacity: 1; }
+      50.5% { opacity: 1; }
+      51% { opacity: 0; }
+      51.5% { opacity: 1; }
+      52% { opacity: 0; }
+      52.5% { opacity: 1; }
+      53% { opacity: 0; }
+      53.5% { opacity: 1; }
+      60% { opacity: 1; }
+      80% { opacity: 1; }
+      80.5% { opacity: 0; }
+      81% { opacity: 1; }
+    }
+
+    .social-links {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+      max-width: 380px;
+      z-index: 20;
+      position: relative;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 18px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(0.95rem, 3.5vw, 1.05rem);
+      background: rgba(0, 15, 0, 0.6);
+      color: #0f0;
+      text-decoration: none;
+      border: 1px solid #080;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 1px;
+      backdrop-filter: blur(2px);
+    }
+
+    .btn:hover {
+      background: rgba(0, 30, 0, 0.8);
+      box-shadow: 0 0 12px rgba(0, 255, 0, 0.5);
+      transform: translateX(4px);
+      border-color: #0f0;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+      color: #ff0;
+      text-shadow: 0 0 4px #ff8, 0 0 8px #ff4;
+      letter-spacing: 0.8px;
+      opacity: 0.9;
+      z-index: 20;
+      position: relative;
+      text-align: center;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    #play-audio-btn {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      width: 44px;
+      height: 44px;
+      background: rgba(0, 10, 0, 0.7);
+      border: 1px solid #0a0;
+      border-radius: 50%;
+      color: #0f0;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 30;
+      backdrop-filter: blur(2px);
+      box-shadow: 0 0 6px rgba(0, 150, 0, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    #play-audio-btn:hover {
+      background: rgba(0, 20, 0, 0.9);
+      box-shadow: 0 0 12px rgba(0, 255, 0, 0.5);
+      transform: scale(1.05);
+    }
+
+    #audio-status {
+      position: fixed;
+      bottom: 64px;
+      right: 16px;
+      background: rgba(0, 10, 0, 0.8);
+      color: #0f0;
+      padding: 5px 10px;
+      border: 1px solid #080;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-family: 'Share Tech Mono', monospace;
+      z-index: 31;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    @media (max-width: 480px) {
+      .profile-pic {
+        width: 100px;
+        height: 100px;
+      }
+      h1 {
+        font-size: 1.6rem;
+      }
+      .btn {
+        font-size: 0.95rem;
+        padding: 10px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+  <div class="grid-overlay"></div>
+
+  <!-- Audio: Updated to new source, muted autoplay enabled -->
+  <audio id="bgm" preload="auto" muted loop>
+    <source src="https://raw.githubusercontent.com/modelkhan/modelkhan.github.io/main/khalid%20Bin%20Waleed%20%20R.A.mp3" type="audio/mpeg">
+  </audio>
+
+  <button id="play-audio-btn" title="Unmute / Mute">🔇</button>
+  <div id="audio-status"></div>
+
+  <!-- Profile Image Updated to Ghost.jpg (Converted to Raw Link) -->
+  <div class="profile-container">
+    <img 
+      src="https://raw.githubusercontent.com/modelkhan/modelkhan.github.io/main/ghost.jpg" 
+      alt="SIGMA CYBER GHOST" 
+      class="profile-pic"
+    />
+  </div>
+
+  <!-- Heading Updated to match persona -->
+  <h1>SIGMA CYBER GHOST</h1>
+
+  <div class="social-links">
+    <a href="https://www.youtube.com/@sigma_ghost_hacking" target="_blank" class="btn">
+      <span>❱❱</span> YOUTUBE
+    </a>
+    <a href="https://www.instagram.com/safderkhan0800_/" target="_blank" class="btn">
+      <span>❱❱</span> INSTAGRAM
+    </a>
+    <a href="https://t.me/Sigma_Cyber_Ghost" target="_blank" class="btn">
+      <span>❱❱</span> TELEGRAM (DM)
+    </a>
+    <!-- Added Backup Button -->
+    <a href="https://t.me/+l3HVAiWibCxjYWZl" target="_blank" class="btn">
+      <span>❱❱</span> BACKUP
+    </a>
+  </div>
+
+  <div class="footer">CREATED BY SIGMA CYBER GHOST</div>
+
+  <script>
+    const audio = document.getElementById('bgm');
+    const playBtn = document.getElementById('play-audio-btn');
+    const statusEl = document.getElementById('audio-status');
+
+    audio.volume = 0.5; // 50% volume
+
+    // Try to start muted (allowed by most browsers)
+    audio.play().catch(e => console.log("Autoplay blocked until interaction."));
+
+    function updateButton() {
+      playBtn.textContent = audio.muted ? '🔇' : '🔊';
+      playBtn.title = audio.muted ? 'Unmute' : 'Mute';
+    }
+
+    function showStatus(msg) {
+      statusEl.textContent = msg;
+      statusEl.style.opacity = '1';
+      setTimeout(() => statusEl.style.opacity = '0', 2000);
+    }
+
+    // Enable sound on first user interaction anywhere on page
+    function initAudio() {
+      if (audio.muted) {
+        audio.muted = false;
+        audio.play().catch(() => {});
+        updateButton();
+        showStatus("Music Unmuted");
+        // Remove listeners so it doesn't pop up again
+        document.removeEventListener('click', initAudio);
+        document.removeEventListener('touchstart', initAudio);
+      }
+    }
+
+    document.addEventListener('click', initAudio);
+    document.addEventListener('touchstart', initAudio);
+
+    // Manual mute toggle for the button
+    playBtn.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent triggering the global initAudio
+      audio.muted = !audio.muted;
+      if (!audio.muted) {
+        audio.play();
+      }
+      updateButton();
+      showStatus(audio.muted ? "Muted" : "Unmuted");
+    });
+
+    // Matrix Rain Animation
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    resizeCanvas();
+
+    // Updated phrase to "SIGMA GHOST "
+    const phrase = "SIGMA GHOST ".split('');
+    const fontSize = 16;
+    const fontFamily = "'Share Tech Mono', monospace";
+    
+    ctx.font = `${fontSize}px ${fontFamily}`;
+    const charWidth = ctx.measureText("W").width;
+    let columnCount = Math.floor(canvas.width / charWidth) + 2;
+    let drops = [];
+
+    // Initialize drops
+    for (let i = 0; i < columnCount; i++) {
+      drops[i] = {
+        x: i * charWidth,
+        charIndex: Math.floor(Math.random() * phrase.length),
+        y: Math.floor(Math.random() * -100) // Start above screen
+      };
+    }
+
+    function draw() {
+      // Fading trail effect
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = '#0f0';
+      ctx.font = `${fontSize}px ${fontFamily}`;
+      ctx.textBaseline = 'top';
+
+      for (let i = 0; i < drops.length; i++) {
+        const drop = drops[i];
+        const char = phrase[drop.charIndex];
+        
+        ctx.fillText(char, drop.x, drop.y * fontSize);
+        
+        // Move to next character in phrase for next frame
+        drop.charIndex = (drop.charIndex + 1) % phrase.length;
+        
+        // Move drop down
+        drop.y++;
+        
+        // Reset drop to top randomly if it goes off screen
+        if (drop.y * fontSize > canvas.height && Math.random() > 0.975) {
+          drop.y = Math.floor(Math.random() * -100);
+        }
+      }
+    }
+
+    let matrixInterval = setInterval(draw, 33); // ~30fps
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      columnCount = Math.floor(canvas.width / charWidth) + 2;
+      drops = [];
+      for (let i = 0; i < columnCount; i++) {
+        drops[i] = {
+          x: i * charWidth,
+          charIndex: Math.floor(Math.random() * phrase.length),
+          y: Math.floor(Math.random() * -100)
+        };
+      }
+    });
+  </script>
+</body>
+</html>
